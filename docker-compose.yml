@@ -1,0 +1,42 @@
+version: '3.8'
+
+networks:
+  app:
+    name: app
+
+services:
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: nginx.dockerfile
+    container_name: nginx
+    restart: unless-stopped
+    depends_on:
+      - php
+    ports:
+      - 9000:80
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app
+
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: php.dockerfile
+    container_name: php
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app
+
+  npm:
+    image: node:13.7
+    container_name: npm
+    volumes: 
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ["npm"]
+    networks:
+      - app
